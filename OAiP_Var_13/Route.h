@@ -1,8 +1,8 @@
-#pragma once
+п»ї#pragma once
 
 struct Route
 {
-	char Number[10]; //Номер маршрута.
-	unsigned int CarsCount;	//Количество единиц транспорта на маршруте.
-	float RouteLength; //Длина маршрута в километрах.
+	char Number[10]; //РќРѕРјРµСЂ РјР°СЂС€СЂСѓС‚Р°.
+	unsigned int CarsCount;	//РљРѕР»РёС‡РµСЃС‚РІРѕ РµРґРёРЅРёС† С‚СЂР°РЅСЃРїРѕСЂС‚Р° РЅР° РјР°СЂС€СЂСѓС‚Рµ.
+	float RouteLength; //Р”Р»РёРЅР° РјР°СЂС€СЂСѓС‚Р° РІ РєРёР»РѕРјРµС‚СЂР°С….
 };

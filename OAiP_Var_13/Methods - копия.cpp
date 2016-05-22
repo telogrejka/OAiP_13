@@ -1,28 +1,28 @@
-п»ї#include "stdafx.h"
+#include "stdafx.h"
 #include "Methods.h"
 #include "Route.h"
 #define BUFFER_SIZE 256
 
-FILE * file; //РЈРєР°Р·Р°С‚РµР»СЊ РЅР° С„Р°Р№Р».
-struct Route *routeArray;	//РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ Р·Р°РїРёСЃРµР№.
-unsigned int recordCount = 0;	//РљРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РїРёСЃРµР№.
-char path[BUFFER_SIZE];	//РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ.
-bool isLoaded = false;	//Р—Р°РіСЂСѓР¶РµРЅ Р»Рё С„Р°Р№Р».
-bool isFileEdited = false; //Р РµРґР°РєС‚РёСЂРѕРІР°Р»СЃСЏ Р»Рё С„Р°Р№Р».
-const short tableWidth = 73; //РЁРёСЂРёРЅР° С‚Р°Р±Р»РёС†С‹.
+FILE * file; //Указатель на файл.
+struct Route *routeArray;	//Указатель на массив записей.
+unsigned int recordCount = 0;	//Количество записей.
+char path[BUFFER_SIZE];	//Путь к файлу.
+bool isLoaded = false;	//Загружен ли файл.
+bool isFileEdited = false; //Редактировался ли файл.
+const short tableWidth = 73; //Ширина таблицы.
 
 void ShowMenu()
 {
 	system("cls");
-	puts("Р“РѕСЂРѕРґСЃРєРѕР№ С‚СЂР°РЅСЃРїРѕСЂС‚\n");
-	puts("1. Р—Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р»");
-	puts("2. Р”РѕР±Р°РІРёС‚СЊ Р·Р°РїРёСЃСЊ РІ РєРѕРЅРµС†");
-	puts("3. РџСЂРѕСЃРјРѕС‚СЂ РІСЃРµС… Р·Р°РїРёСЃРµР№");
-	puts("4. РЎРѕС…СЂР°РЅРёС‚СЊ С„Р°Р№Р»");
-	puts("5. РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° РІС‹Р±СЂР°РЅРЅРѕР№ Р·Р°РїРёСЃРё");
-	puts("6. РЎРѕСЂС‚РёСЂРѕРІРєР° Р·Р°РїРёСЃРµР№ РїРѕ С‡РёСЃР»РѕРІРѕРјСѓ РїРѕР»СЋ");
-	puts("7. РЈРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ, РЅР°С‡РёРЅР°СЏ РѕС‚ РІС‹Р±СЂР°РЅРЅРѕРіРѕ");
-	puts("8. Р’С‹С…РѕРґ");
+	puts("Городской транспорт\n");
+	puts("1. Загрузить файл");
+	puts("2. Добавить запись в конец");
+	puts("3. Просмотр всех записей");
+	puts("4. Сохранить файл");
+	puts("5. Корректировка выбранной записи");
+	puts("6. Сортировка записей по числовому полю");
+	puts("7. Удаление элементов, начиная от выбранного");
+	puts("8. Выход");
 }
 
 int GetRowsCount(FILE *file)
@@ -43,19 +43,19 @@ int GetRowsCount(FILE *file)
 
 void OpenFile()
 {
-	puts("РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ:");
+	puts("Путь к файлу:");
 	scanf("%s", &path);
 	
 	if (file = fopen(path, "r"))
 	{
-		//РЎС‡РёС‚Р°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє РІ С„Р°Р»Рµ
+		//Считаем количество строк в фале
 		recordCount = GetRowsCount(file);
-		//РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ
+		//Инициализируем массив структур
 		routeArray = new Route[recordCount];
-		printf("Р¤Р°Р№Р» '%s' Р·Р°РіСЂСѓР¶РµРЅ! РљРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РїРёСЃРµР№: %u.\n", path, recordCount);
+		printf("Файл '%s' загружен! Количество записей: %u.\n", path, recordCount);
 		isLoaded = true;
 
-		//РџР°СЂСЃРёРј СЃС‚СЂРѕРєРё С„Р°Р№Р»Р° РІ СЃС‚СЂСѓРєС‚СѓСЂС‹
+		//Парсим строки файла в структуры
 		char fcontent[BUFFER_SIZE];
 		char* line;
 		int i = 0;
@@ -70,7 +70,7 @@ void OpenFile()
 	}
 	else
 	{
-		printf("РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р» '%s'.\n", path);
+		printf("Не удалось загрузить файл '%s'.\n", path);
 		getch();
 		isLoaded = false;
 	}
@@ -110,7 +110,7 @@ void Print()
 void PrintHeader()
 {
 	PrintLine();
-	printf("|РќРѕРјРµСЂ РјР°СЂС€СЂСѓС‚Р°\t\t|Р•РґРёРЅРёС† С‚СЂР°РЅСЃРїРѕСЂС‚Р°\t|Р”Р»РёРЅР° РјР°СЂС€СЂСѓС‚Р°(РєРј)\t|\n");
+	printf("|Номер маршрута\t\t|Единиц транспорта\t|Длина маршрута(км)\t|\n");
 	PrintLine();
 }
 
@@ -126,13 +126,13 @@ bool isFileLoaded()
 {
 	if (!isLoaded)
 	{
-		puts("Р¤Р°Р№Р» РЅРµ Р·Р°РіСЂСѓР¶РµРЅ.");
+		puts("Файл не загружен.");
 		getch();
 		return false;
 	}
 	if (routeArray == NULL)
 	{
-		puts("РњР°СЃСЃРёРІ Р·Р°РїРёСЃРµР№ РїСѓСЃС‚.");
+		puts("Массив записей пуст.");
 		getch();
 		return false;
 	}
@@ -145,21 +145,21 @@ bool isFileLoaded()
 
 void addRecord(Route *route)
 {
-	//РЎРѕР·РґР°РµРј РјР°СЃСЃРёРІ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° Р·Р°РїРёСЃРё СЂР°Р·РјРµСЂРѕРј Р±РѕР»СЊС€Рµ С‚РµРєСѓС‰РµРіРѕ 1
+	//Создаем массив указателей на записи размером больше текущего 1
 	struct Route *temp = new Route[recordCount+1];
-	//РљРѕРїРёСЂСѓРµРј РІ РЅРµРіРѕ СЃРѕРґРµСЂР¶РёРјРѕРµ С‚РµРєСѓС‰РµРіРѕ РјР°СЃСЃРёРІР°
+	//Копируем в него содержимое текущего массива
 	memcpy(temp, routeArray, (recordCount) * sizeof(Route));
-	//РљРѕРїРёСЂСѓРµРј РЅРѕРІСѓСЋ Р·Р°РїРёСЃСЊ РІ РєРѕРЅРµС†
+	//Копируем новую запись в конец
 	memcpy(&temp[recordCount], route, sizeof(Route));
-	//РћСЃРІРѕР±РѕР¶РґР°РµРј РїР°РјСЏС‚СЊ С‚СѓРєРµС‰РµРіРѕ РјР°СЃСЃРёРІР°
+	//Освобождаем память тукещего массива
 	free(routeArray);
-	//РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј С‚РµРєСѓС‰РµРјСѓ РјР°СЃСЃРёРІСѓ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅРѕРІС‹Р№
+	//Устанавливаем текущему массиву указатель на новый
 	routeArray = temp;
-	//РЈРІРµР»РёС‡РёРІР°РµРј СЃС‡РµС‚С‡РёРє С‡РёСЃР»Р° Р·Р°РїРёСЃРµР№ РЅР° 1 
+	//Увеличиваем счетчик числа записей на 1 
 	recordCount++;
-	//РџРѕРјРµС‡Р°РµРј С‡С‚Рѕ РјР°СЃСЃРёРІ РёР·РјРµРЅРµРЅ
+	//Помечаем что массив изменен
 	isFileEdited = true;
-	printf("Р—Р°РїРёСЃСЊ РґРѕР±Р°РІР»РµРЅР°! РљРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РїРёСЃРµР№: %u\n", recordCount);
+	printf("Запись добавлена! Количество записей: %u\n", recordCount);
 	Print();
 }
 
@@ -171,12 +171,12 @@ void fflushstdin()
 
 int EnterCarsCount()
 {
-	printf("Р•РґРёРЅРёС† С‚СЂР°РЅСЃРїРѕСЂС‚Р°: ");
+	printf("Единиц транспорта: ");
 	unsigned int carsCount;
 	fflushstdin();
 	if (scanf("%d", &carsCount) != 1)
 	{
-		puts("РћС€РёР±РєР° С„РѕСЂРјР°С‚Р° РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С….");
+		puts("Ошибка формата входных данных.");
 		return EnterCarsCount();
 	}
 	else
@@ -187,12 +187,12 @@ int EnterCarsCount()
 
 float EnterRouteLength()
 {
-	printf("Р”Р»РёРЅР° РјР°СЂС€СЂСѓС‚Р°(РєРј): ");
+	printf("Длина маршрута(км): ");
 	float routeLength = 0.0;
 	fflushstdin();
 	if (scanf("%f", &routeLength) != 1)
 	{
-		puts("РћС€РёР±РєР° С„РѕСЂРјР°С‚Р° РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С….");
+		puts("Ошибка формата входных данных.");
 		return EnterRouteLength();
 	}
 	else
@@ -204,7 +204,7 @@ float EnterRouteLength()
 char* EnterNumber()
 {
 	char Number[BUFFER_SIZE];
-	printf("РќРѕРјРµСЂ РјР°СЂС€СЂСѓС‚Р°: ");
+	printf("Номер маршрута: ");
 	scanf("%10s", &Number);
 	return Number;
 }
@@ -213,7 +213,7 @@ void Add()
 {
 	if (!isFileLoaded()) return;
 	system("cls");
-	puts("Р”РѕР±Р°РІР»РµРЅРёРµ Р·Р°РїРёСЃРё.\n");
+	puts("Добавление записи.\n");
 	Route route;
 	strcpy(route.Number, EnterNumber());
 	route.CarsCount = EnterCarsCount();
@@ -225,20 +225,20 @@ void Edit()
 {
 	if (!isFileLoaded()) return;
 	system("cls");
-	puts("Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ Р·Р°РїРёСЃРё.\n");
-	printf("Р’РІРµРґРёС‚Рµ РёРЅРґРµРєСЃ Р·Р°РїРёСЃРё (РѕС‚ 0 РґРѕ %u): ", recordCount - 1);
+	puts("Редактирование записи.\n");
+	printf("Введите индекс записи (от 0 до %u): ", recordCount - 1);
 	unsigned int index = 0;
 	scanf("%u", &index);
 	if (index > recordCount - 1)
 	{
-		puts("РћС€РёР±РєР°! РЈРєР°Р·Р°РЅРЅС‹Р№ РёРЅРґРµРєСЃ РЅР°С…РѕРґРёС‚СЃСЏ Р·Р° РіСЂР°РЅРёС†Р°РјРё РјР°СЃСЃРёРІР°.");
+		puts("Ошибка! Указанный индекс находится за границами массива.");
 		getch();
 		return;
 	}
-	puts("Р’С‹Р±РµСЂРёС‚Рµ РїРѕР»Рµ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ:");
-	puts(" 1. РќРѕРјРµСЂ РјР°СЂС€СЂСѓС‚Р°");
-	puts(" 2. Р•РґРёРЅРёС† С‚СЂР°РЅСЃРїРѕСЂС‚Р°");
-	puts(" 3. Р”Р»РёРЅР° РјР°СЂС€СЂСѓС‚Р°");
+	puts("Выберите поле для редактирования:");
+	puts(" 1. Номер маршрута");
+	puts(" 2. Единиц транспорта");
+	puts(" 3. Длина маршрута");
 	char field = getch();
 	switch (field)
 	{
@@ -260,10 +260,10 @@ void Sort()
 {
 	if (!isFileLoaded()) return;
 	system("cls");
-	puts("РЎРѕСЂС‚РёСЂРѕРІРєР° РјР°СЃСЃРёРІР° РїРѕ С‡РёСЃР»РѕРІРѕРјСѓ РїРѕР»СЋ.\n");
-	puts("Р’С‹Р±РµСЂРёС‚Рµ РїРѕР»Рµ, РїРѕ РєРѕС‚РѕСЂРѕРјСѓ РЅР°РґРѕ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°С‚СЊ РјР°СЃСЃРёРІ:");
-	puts(" 1. РљРѕР»РёС‡РµСЃС‚РІРѕ РµРґРёРЅРёС† С‚СЂР°РЅСЃРїРѕСЂС‚Р° РЅР° РјР°СЂС€СѓС‚Рµ");
-	puts(" 2. Р”Р»РёРЅР° РјР°СЂС€СЂСѓС‚Р°");
+	puts("Сортировка массива по числовому полю.\n");
+	puts("Выберите поле, по которому надо отсортировать массив:");
+	puts(" 1. Количество единиц транспорта на маршуте");
+	puts(" 2. Длина маршрута");
 	char field = getch();
 	switch (field)
 	{
@@ -282,39 +282,39 @@ void RemoveRange()
 {
 	if (!isFileLoaded()) return;
 	system("cls");
-	puts("РЈРґР°Р»РµРЅРёРµ Р·Р°РїРёСЃРµР№ РЅР°С‡РёРЅР°СЏ РѕС‚ РІС‹Р±СЂР°РЅРЅРѕР№.\n");
-	printf("РРЅРґРµРєСЃ Р·Р°РїРёСЃРё (РѕС‚ 0 РґРѕ %u): ", recordCount - 1);
+	puts("Удаление записей начиная от выбранной.\n");
+	printf("Индекс записи (от 0 до %u): ", recordCount - 1);
 	unsigned int index = 0;
 	scanf("%u", &index);
 	if (index > recordCount - 1)
 	{
-		puts("РћС€РёР±РєР°! РЈРєР°Р·Р°РЅРЅС‹Р№ РёРЅРґРµРєСЃ РЅР°С…РѕРґРёС‚СЃСЏ Р·Р° РіСЂР°РЅРёС†Р°РјРё РјР°СЃСЃРёРІР°.");
+		puts("Ошибка! Указанный индекс находится за границами массива.");
 		getch();
 		return;
 	}
-	printf("Р’РЅРёРјР°РЅРёРµ! Р‘СѓРґСѓС‚ СѓРґР°Р»РµРЅС‹ РІСЃРµ Р·Р°РїРёСЃРё РЅР°С‡РёРЅР°СЏ СЃ %u-Р№. РџСЂРѕРґРѕР»Р¶РёС‚СЊ? y/n\n", index);
+	printf("Внимание! Будут удалены все записи начиная с %u-й. Продолжить? y/n\n", index);
 	char choise = getch();
 	switch (choise)
 	{
 		case 'y':
 		{
-			//РЎС‡РёС‚Р°РµРј СЃРєРѕР»СЊРєРѕ Р·Р°РїРёСЃРµР№ РЅСѓР¶РЅРѕ РѕСЃС‚Р°РІРёС‚СЊ
+			//Считаем сколько записей нужно оставить
 			recordCount = recordCount - (recordCount - index);
-			//РЎРѕР·РґР°РµРј РјР°СЃСЃРёРІ СЃ РЅРѕРІС‹Рј РєРѕР»РёС‡РµСЃС‚РІРѕРј Р·Р°РїРёСЃРµР№
+			//Создаем массив с новым количеством записей
 			struct Route *temp = new Route[recordCount];
 			memcpy(temp, routeArray, recordCount * sizeof(Route));
 			free(routeArray);
-			//РџСЂРёСЃРІР°РёРІР°РµРј С‚РµРєСѓС‰РµРјСѓ РјР°СЃСЃРёРІСѓ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅРѕРІС‹Р№
+			//Присваиваем текущему массиву указатель на новый
 			routeArray = temp;
 
-			puts("Р—Р°РїРёСЃРё СѓРґР°Р»РµРЅС‹!");
+			puts("Записи удалены!");
 			isFileEdited = true;
 			Print();
 			break;
 		}
 		default:
 		{
-			puts("РћС‚РјРµРЅРµРЅРѕ.");
+			puts("Отменено.");
 			getch();
 			break;
 		}
@@ -332,12 +332,12 @@ void SaveFile()
 		}
 		fclose(file);
 		isFileEdited = false;
-		printf("Р¤Р°Р№Р» '%s' СЃРѕС…СЂР°РЅРµРЅ.\n", path);
+		printf("Файл '%s' сохранен.\n", path);
 		getch();
 	}
 	else
 	{
-		printf("РћС€РёР±РєР° СЃРѕС…СЂР°РЅРµРЅРёСЏ С„Р°Р№Р»Р° '%s'.\n");
+		printf("Ошибка сохранения файла '%s'.\n");
 		getch();
 		return;
 	}
@@ -347,7 +347,7 @@ void Exit()
 {
 	if (isFileEdited)
 	{
-		puts("Р¤Р°Р№Р» Р±С‹Р» РёР·РјРµРЅРµРЅ. РЎРѕС…СЂР°РЅРёС‚СЊ? y/n");
+		puts("Файл был изменен. Сохранить? y/n");
 		char answer = getch();
 		if (answer == 'y')
 		{
@@ -361,7 +361,7 @@ void CreateTestFile()
 {
 	struct Route route1 = { "18A" , 8, 6.2 };
 	struct Route route2 = { "11" , 5, 7.15 };
-	struct Route route3 = { "15Р‘" , 2, 9.8 };
+	struct Route route3 = { "15Б" , 2, 9.8 };
 	struct Route route4 = { "32" , 4, 8.48 };
 	struct Route route5 = { "50" , 11, 10.6 };
 
@@ -385,7 +385,7 @@ void WriteRecord(struct Route *route)
 void EditNumber(int index)
 {
 	strcpy(routeArray[index].Number, EnterNumber());
-	puts("РќРѕРјРµСЂ РјР°СЂС€СЂСѓС‚Р° РёР·РјРµРЅРµРЅ!");
+	puts("Номер маршрута изменен!");
 	isFileEdited = true;
 	Print();
 }
@@ -393,7 +393,7 @@ void EditNumber(int index)
 void EditCarsCount(int index)
 {
 	routeArray[index].CarsCount = EnterCarsCount();
-	puts("РљРѕР»РёС‡РµСЃС‚РІРѕ РјР°С€РёРЅ РјР°СЂС€СЂСѓС‚Р° РёР·РјРµРЅРµРЅРѕ!");
+	puts("Количество машин маршрута изменено!");
 	isFileEdited = true;
 	Print();
 }
@@ -401,12 +401,12 @@ void EditCarsCount(int index)
 void EditRouteLength(int index)
 {
 	routeArray[index].RouteLength = EnterRouteLength();
-	puts("Р”Р»РёРЅР° РјР°СЂС€СЂСѓС‚Р° РёР·РјРµРЅРµРЅР°!");
+	puts("Длина маршрута изменена!");
 	isFileEdited = true;
 	Print();
 }
 
-int РЎompareByCarsCount(const void *elem1, const void *elem2)
+int СompareByCarsCount(const void *elem1, const void *elem2)
 {
 	Route *first = (Route*)elem1;
 	Route *second = (Route*)elem2;
@@ -418,7 +418,7 @@ int РЎompareByCarsCount(const void *elem1, const void *elem2)
 		return 0;
 }
 
-int РЎompareByRouteLength(const void *elem1, const void *elem2)
+int СompareByRouteLength(const void *elem1, const void *elem2)
 {
 	Route *first = (Route*)elem1;
 	Route *second = (Route*)elem2;
@@ -432,16 +432,16 @@ int РЎompareByRouteLength(const void *elem1, const void *elem2)
 
 void SortByCarsCount()
 {
-	qsort(routeArray, recordCount, sizeof(Route), РЎompareByCarsCount);
+	qsort(routeArray, recordCount, sizeof(Route), СompareByCarsCount);
 	isFileEdited = true;
-	puts("РћС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅРѕ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ РјР°С€РёРЅ!");
+	puts("Отсортированно по количеству машин!");
 	Print();
 }
 
 void SortByRouteLength()
 {
-	qsort(routeArray, recordCount, sizeof(Route), РЎompareByRouteLength);
+	qsort(routeArray, recordCount, sizeof(Route), СompareByRouteLength);
 	isFileEdited = true;
-	puts("РћС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅРѕ РїРѕ РґР»РёРЅРµ РјР°СЂС€СЂСѓС‚Р°!");
+	puts("Отсортированно по длине маршрута!");
 	Print();
 }
